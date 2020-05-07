@@ -4,7 +4,12 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -12,7 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -21,7 +26,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.beacon.moive.Adapters.BeaconScanRecyclerViewAdapter;
+import com.beacon.moive.Adapters.AdminScanRecyclerViewAdapter;
 import com.beacon.moive.Beans.BeaconDevice;
 import com.beacon.moive.R;
 import com.beacon.moive.Utils.ToastUtil;
@@ -33,6 +38,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class AdminBeaconScanActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = AdminBeaconScanActivity.class.getSimpleName();
@@ -44,7 +50,7 @@ public class AdminBeaconScanActivity extends AppCompatActivity implements Naviga
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning = false;
     private Handler handler = new Handler();
-    private BeaconScanRecyclerViewAdapter mBleRecyclerViewAdapter;
+    private AdminScanRecyclerViewAdapter mBleRecyclerViewAdapter;
     private List<BeaconDevice> mBleDeviceInfoList = new ArrayList<>();
 
     @Override
@@ -80,9 +86,12 @@ public class AdminBeaconScanActivity extends AppCompatActivity implements Naviga
         }
     }
 
+    /**
+     * 初始化RecyclerView
+     */
     @SuppressLint("WrongConstant")
     private void initViews() {
-        mBleRecyclerViewAdapter = new BeaconScanRecyclerViewAdapter(AdminBeaconScanActivity.this);
+        mBleRecyclerViewAdapter = new AdminScanRecyclerViewAdapter(AdminBeaconScanActivity.this);
         mBleRecyclerViewAdapter.setBleDeviceList(mBleDeviceInfoList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -95,6 +104,9 @@ public class AdminBeaconScanActivity extends AppCompatActivity implements Naviga
         });
     }
 
+    /**
+     * ActionBar中Scan和Stop的切换
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -111,6 +123,9 @@ public class AdminBeaconScanActivity extends AppCompatActivity implements Naviga
         return true;
     }
 
+    /**
+     * Scan和Stop的点击响应
+     * */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -138,6 +153,7 @@ public class AdminBeaconScanActivity extends AppCompatActivity implements Naviga
     /**
      * 停止蓝牙扫描
      */
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void stopScan() {
         mScanning = false;
         scanLeDevice(false);
@@ -148,7 +164,7 @@ public class AdminBeaconScanActivity extends AppCompatActivity implements Naviga
      */
     private void notifyDataSetChanged() {
         if (mBleRecyclerViewAdapter == null) {
-            mBleRecyclerViewAdapter = new BeaconScanRecyclerViewAdapter(AdminBeaconScanActivity.this);
+            mBleRecyclerViewAdapter = new AdminScanRecyclerViewAdapter(AdminBeaconScanActivity.this);
             mBleRecyclerViewAdapter.setBleDeviceList(mBleDeviceInfoList);
             mRcBleScan.setAdapter(mBleRecyclerViewAdapter);
         }
@@ -166,12 +182,48 @@ public class AdminBeaconScanActivity extends AppCompatActivity implements Naviga
      *
      * @param enable true开启扫描 false关闭扫描
      */
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             // Stops scanning after a pre-defined scan period.
             handler.postDelayed(startScanRunnable, SCAN_PERIOD);
 
             mScanning = true;
+            //指定需要识别到的蓝牙设备
+            List<ScanFilter> scanFilterList = new ArrayList<>();
+            ScanFilter.Builder builder = new ScanFilter.Builder();
+            builder.setDeviceName("CKS_BLE(B615383F97D8)");
+            ScanFilter scanFilter = builder.build();
+            scanFilterList.add(scanFilter);
+//
+//            //指定蓝牙的方式，这里设置的ScanSettings.SCAN_MODE_LOW_LATENCY是比较高频率的扫描方式
+            ScanSettings.Builder settingBuilder = new ScanSettings.Builder();
+            settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
+            settingBuilder.setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
+            settingBuilder.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES);
+            settingBuilder.setLegacy(true);//false10秒一次 true大约20s一次
+            ScanSettings settings = settingBuilder.build();
+            mBluetoothAdapter.getBluetoothLeScanner().startScan(scanFilterList, settings, new ScanCallback() {
+                @Override
+                public void onScanResult(int callbackType, ScanResult result) {
+                    super.onScanResult(callbackType, result);
+                    Log.e(TAG, "onScanResult: " + result.getDevice().getName());
+                }
+
+                @Override
+                public void onBatchScanResults(List<ScanResult> results) {
+                    super.onBatchScanResults(results);
+                    for (ScanResult scanResult : results) {
+                        Log.e(TAG, "onBatchScanResults: " + scanResult.getDevice().getName());
+                    }
+                }
+
+                @Override
+                public void onScanFailed(int errorCode) {
+                    super.onScanFailed(errorCode);
+                    Log.e(TAG, "onScanFailed: " + errorCode);
+                }
+            });
             mBluetoothAdapter.startLeScan(mLeScanCallback);
         } else {
             mScanning = false;
@@ -183,24 +235,27 @@ public class AdminBeaconScanActivity extends AppCompatActivity implements Naviga
     /**
      * 蓝牙扫描回调
      */
-    private final BluetoothAdapter.LeScanCallback mLeScanCallback = (device, rssi, scanRecord) -> {
-        //不能做耗时操作，特别是周围设备多的时候
-        AdminBeaconScanActivity.this.runOnUiThread(() -> {
-            if (!AdminBeaconScanActivity.this.deviceInfoExists(device.getAddress())) {
-                if (device.getName() != null) {
-                    BeaconDevice beaconDeviceInfo = new BeaconDevice(device, rssi, scanRecord);
-                    Log.e(TAG, "beaconDeviceInfo: " + beaconDeviceInfo.getMinor());
-                    mBleDeviceInfoList.add(beaconDeviceInfo);
-                    runOnUiThread(this::notifyDataSetChanged);
-                }
-            } else {
+    private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+        @Override
+        public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+            //不能做耗时操作，特别是周围设备多的时候
+            AdminBeaconScanActivity.this.runOnUiThread(() -> {
+                if (!AdminBeaconScanActivity.this.deviceInfoExists(device.getAddress())) {
+                    if (device.getName() != null) {
+                        BeaconDevice beaconDeviceInfo = new BeaconDevice(device, rssi, scanRecord);
+                        Log.e(TAG, "beaconDeviceInfo: " + beaconDeviceInfo.getName());
+                        mBleDeviceInfoList.add(beaconDeviceInfo);
+                        AdminBeaconScanActivity.this.runOnUiThread(AdminBeaconScanActivity.this::notifyDataSetChanged);
+                    }
+                } else {
 //                 Already in list, update RSSI info
-                BeaconDevice deviceInfo = AdminBeaconScanActivity.this.findDeviceInfo(device);
-                assert deviceInfo != null;
-                deviceInfo.updateParameters(rssi, device.getName(), scanRecord);
-                notifyDataSetChanged();
-            }
-        });
+                    BeaconDevice deviceInfo = AdminBeaconScanActivity.this.findDeviceInfo(device);
+                    assert deviceInfo != null;
+                    deviceInfo.updateParameters(rssi, device.getName(), scanRecord);
+                    AdminBeaconScanActivity.this.notifyDataSetChanged();
+                }
+            });
+        }
     };
 
 

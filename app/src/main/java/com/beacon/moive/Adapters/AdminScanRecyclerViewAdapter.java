@@ -3,7 +3,6 @@ package com.beacon.moive.Adapters;
 import android.annotation.SuppressLint;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +35,7 @@ import butterknife.ButterKnife;
  * Bugzilla Id:
  * Modify Content:
  */
-public class BeaconScanRecyclerViewAdapter extends RecyclerView.Adapter<BeaconScanRecyclerViewAdapter.BleViewHolder> {
+public class AdminScanRecyclerViewAdapter extends RecyclerView.Adapter<AdminScanRecyclerViewAdapter.BleViewHolder> {
 
     private final MoiveDbUtil moiveDbUtil;
 
@@ -47,7 +46,7 @@ public class BeaconScanRecyclerViewAdapter extends RecyclerView.Adapter<BeaconSc
     }
     private List<BeaconDevice> mBleDeviceList;
 
-    public BeaconScanRecyclerViewAdapter(Context context) {
+    public AdminScanRecyclerViewAdapter(Context context) {
         moiveDbUtil = new MoiveDbUtil(context);
     }
 
@@ -116,7 +115,7 @@ public class BeaconScanRecyclerViewAdapter extends RecyclerView.Adapter<BeaconSc
         }
     }
 
-    public void setOnItemClickListener(BeaconScanRecyclerViewAdapter.onItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(AdminScanRecyclerViewAdapter.onItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 

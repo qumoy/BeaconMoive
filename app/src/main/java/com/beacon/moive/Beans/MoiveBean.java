@@ -11,7 +11,7 @@ import java.util.List;
  * Bugzilla Id:
  * Modify Content:
  */
-public class MoiveBean {
+public class MoiveBean implements Comparable<MoiveBean> {
     //电影图片地址
     private String moivePic;
     //电影名称
@@ -28,6 +28,16 @@ public class MoiveBean {
     private List<String> moivePost;
     //BeaconMinor
     private int minor;
+
+    public int getmRssi() {
+        return mRssi;
+    }
+
+    public void setmRssi(int mRssi) {
+        this.mRssi = mRssi;
+    }
+
+    private int mRssi;
 
     public List<String> getMoivePost() {
         return moivePost;
@@ -94,5 +104,9 @@ public class MoiveBean {
         this.moiveDescription = moiveDescription;
     }
 
-
+    @Override
+    public int compareTo(MoiveBean o) {
+        int rssi = o.getmRssi();
+        return rssi - this.mRssi;
+    }
 }

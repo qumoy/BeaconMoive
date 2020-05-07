@@ -97,16 +97,16 @@ public class MoiveDbUtil {
         @SuppressLint("Recycle") Cursor cursor = db.query("Moive", null, "minor=" + minor, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                MoiveBean beaconInfo = new MoiveBean();
-                beaconInfo.setMinor(cursor.getInt(cursor.getColumnIndex("minor")));
-                beaconInfo.setMoivePic(cursor.getString(cursor.getColumnIndex("pic")));
-                beaconInfo.setMoiveName(cursor.getString(cursor.getColumnIndex("name")));
-                beaconInfo.setMoiveActor(cursor.getString(cursor.getColumnIndex("actor")));
-                beaconInfo.setMoiveTime(cursor.getString(cursor.getColumnIndex("time")));
-                beaconInfo.setMoiveType(cursor.getString(cursor.getColumnIndex("type")));
-                beaconInfo.setMoiveDescription(cursor.getString(cursor.getColumnIndex("description")));
-                beaconInfo.setMoivePost(gson.fromJson(cursor.getString(cursor.getColumnIndex("post")), type));
-                return beaconInfo;
+                MoiveBean moiveBean = new MoiveBean();
+                moiveBean.setMinor(cursor.getInt(cursor.getColumnIndex("minor")));
+                moiveBean.setMoivePic(cursor.getString(cursor.getColumnIndex("pic")));
+                moiveBean.setMoiveName(cursor.getString(cursor.getColumnIndex("name")));
+                moiveBean.setMoiveActor(cursor.getString(cursor.getColumnIndex("actor")));
+                moiveBean.setMoiveTime(cursor.getString(cursor.getColumnIndex("time")));
+                moiveBean.setMoiveType(cursor.getString(cursor.getColumnIndex("type")));
+                moiveBean.setMoiveDescription(cursor.getString(cursor.getColumnIndex("description")));
+                moiveBean.setMoivePost(gson.fromJson(cursor.getString(cursor.getColumnIndex("post")), type));
+                return moiveBean;
             } while (cursor.moveToNext());
         }
         db.close();//数据库用完关闭
@@ -126,16 +126,16 @@ public class MoiveDbUtil {
         @SuppressLint("Recycle") Cursor cursor = db.query("Moive", null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                MoiveBean beaconInfo = new MoiveBean();
-                beaconInfo.setMinor(cursor.getInt(cursor.getColumnIndex("minor")));
-                beaconInfo.setMoivePic(cursor.getString(cursor.getColumnIndex("pic")));
-                beaconInfo.setMoiveName(cursor.getString(cursor.getColumnIndex("name")));
-                beaconInfo.setMoiveActor(cursor.getString(cursor.getColumnIndex("actor")));
-                beaconInfo.setMoiveTime(cursor.getString(cursor.getColumnIndex("time")));
-                beaconInfo.setMoiveType(cursor.getString(cursor.getColumnIndex("type")));
-                beaconInfo.setMoiveDescription(cursor.getString(cursor.getColumnIndex("description")));
-                beaconInfo.setMoivePost(gson.fromJson(cursor.getString(cursor.getColumnIndex("post")), type));
-                list.add(beaconInfo);
+                MoiveBean moiveBean = new MoiveBean();
+                moiveBean.setMinor(cursor.getInt(cursor.getColumnIndex("minor")));
+                moiveBean.setMoivePic(cursor.getString(cursor.getColumnIndex("pic")));
+                moiveBean.setMoiveName(cursor.getString(cursor.getColumnIndex("name")));
+                moiveBean.setMoiveActor(cursor.getString(cursor.getColumnIndex("actor")));
+                moiveBean.setMoiveTime(cursor.getString(cursor.getColumnIndex("time")));
+                moiveBean.setMoiveType(cursor.getString(cursor.getColumnIndex("type")));
+                moiveBean.setMoiveDescription(cursor.getString(cursor.getColumnIndex("description")));
+                moiveBean.setMoivePost(gson.fromJson(cursor.getString(cursor.getColumnIndex("post")), type));
+                list.add(moiveBean);
             } while (cursor.moveToNext());
         }
         db.close();//数据库用完关闭

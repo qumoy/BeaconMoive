@@ -19,6 +19,7 @@ import com.beacon.moive.Beans.MoiveBean;
 import com.beacon.moive.R;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -36,6 +37,8 @@ import butterknife.ButterKnife;
 public class MoiveBriefRecyclerViewAdapter extends RecyclerView.Adapter<MoiveBriefRecyclerViewAdapter.MoiveViewHolder> {
 
     public void setMoiveList(List<MoiveBean> mMoiveList) {
+        //对数组进行排序根据rssi值
+        Collections.sort(mMoiveList);
         this.mMoiveList = mMoiveList;
     }
 

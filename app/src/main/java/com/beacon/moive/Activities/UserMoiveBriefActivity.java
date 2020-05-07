@@ -207,6 +207,7 @@ public class UserMoiveBriefActivity extends AppCompatActivity implements Navigat
 //                    if (beaconDeviceInfo.getMinor())
                     if (deviceInfoExistInDb(beaconDeviceInfo.getMinor()) && mMoiveBean != null) {
                         //设备minor若保存在数据库中则添加电影集合
+                        mMoiveBean.setmRssi(rssi);
                         mMoiveList.add(mMoiveBean);
                         Log.e("test", ": "+mMoiveList.size());
                     }
